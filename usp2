@@ -1,3 +1,7 @@
+2. Write a program to implement client - server communication using pipes. 
+Client should send a string to the server and it should change the first character 
+of the string to uppercase and sends it back to client
+
 CLIENT.C
 #include <stdio.h>
 #include <unistd.h>
