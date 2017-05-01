@@ -1,0 +1,96 @@
+SERVER
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include<unistd.h>
+#include<sys/stat.h>
+#include<sys/msg.h>
+
+#define MAXSIZE     27
+
+void die(char *s)
+{
+    perror(s);
+    exit(1);
+}
+
+int main()
+{
+    char c;
+    int shmid;
+    key_t key;
+    char *shm, *s;
+    key = 5678;
+
+    if ((shmid = shmget(key, MAXSIZE, IPC_CREAT | 0666)) < 0)
+          die("shmget");
+if ((shm = shmat(shmid, NULL, 0)) == (char *) -1)
+          die("shmat");
+    /* Put some things into the memory for the other process to read. */
+    s = shm;
+
+for (c = 'a'; c <= 'z'; c++)
+           *s++ = c;
+    while (*shm != '*')
+        sleep(1);
+    exit(0);
+}
+//send from server to client
+
+CLIENT
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<sys/msg.h>
+#include<unistd.h>
+#define MAXSIZE     27
+
+void die(char *s)
+{
+    perror(s);
+    exit(1);
+}
+
+int main()
+{
+int shmid;
+key_t key;
+    char *shm, *s;
+    key = 5678;
+    if ((shmid = shmget(key, MAXSIZE, 0666)) < 0)
+          die("shmget");
+    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1)
+          die("shmat");
+    //Now read what the server put in the memory.
+for (s = shm; *s != '\0'; s++)
+          putchar(*s);
+putchar('\n');
+
+    /* Change the first character of the segment to '*', indicating we have read the segment.  */
+     *shm = '*';
+    exit(0);
+}
+
+Output:-
+
+On executing client only, 
+cc client2.c -o client2
+./client2
+*bcdefghijklmnopqrstuvwxyz
+
+On executing server, then client,
+Server terminal
+cc server2.c -o server2
+nagashri@nagashri-HP-15-Notebook-PC:~/usp$ ./server2
+
+Client terminal
+nagashri@nagashri-HP-15-Notebook-PC:~/usp$ ./client2
+Abcdefghijklmnopqrstuvwxyz
