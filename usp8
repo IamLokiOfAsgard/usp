@@ -1,0 +1,68 @@
+8. Write a program to setup a timer and setup handler for the timer using fork (or exec) to check who gets the timer signal
+
+Using fork
+
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+
+void handler()
+{
+    printf("PID calling handler : %d\n",getpid());
+}
+
+int main()
+{
+    pid_t pid = fork();
+    signal(SIGALRM,handler);
+    alarm(5);
+    if(pid)
+    {
+           printf("PID of Parent : %d\n",getpid());
+           sleep(10);
+    }
+    else if(!pid)
+    {
+           printf("PID of child : %d\n", getpid());
+             sleep(10);
+    }
+}
+
+Output:
+./a.out
+PID of Parent : 3956
+PID of child : 3957
+PID calling handler : 3957
+PID calling handler : 3956
+
+
+Using exec
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+
+void timer_handler(int signo)
+{
+    printf("pid : %d timer recd\n", getpid());
+}
+
+int main()
+{
+    int pid;
+    printf("parent pid : %d\n", getpid());
+    signal(SIGALRM, timer_handler);
+    alarm(5);
+    if(execl("/bin/sleep", "sleep", "20", (void*)0) < 0)
+           perror("execl"); exit(1);
+}
+// fork
+// timer : only to parent
+// exec
+//       : delivered to execed process
+
+Output:-(mostly wrong)
+./a.out
+parent pid : 3966
+Alarm clock
