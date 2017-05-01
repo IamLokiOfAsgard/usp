@@ -1,0 +1,50 @@
+11. Write a program in which the parent displays uppercase characters A-Z and child displays lowercase 
+characters a-z with a delay of max of 2 seconds between each character. Run the program repeatedly 
+and see if there is racing
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+   pid_t pid;
+   int i;
+   pid = fork();
+   if(pid)
+   {
+      for(i=0;i<26;i++)
+      {
+                printf("Parent : %c\n", (char)(97+i));
+          sleep(1);
+      }
+   }    
+
+   if(!pid)
+   {
+      for(i=0;i<26;i++)
+      {
+          printf("Child : %c\n", (char)(65+i));
+          sleep(1);
+      }
+   }
+}
+
+Output:
+./a.out
+Parent : a
+Child : A
+Parent : b
+Child : B
+Parent : c
+Child : C
+Parent : d
+Child : D
+Child : E
+Parent : e
+Parent : f
+Child : F
+Parent : g
+Child : G
+Child : H
+Parent : h
+And so on till Z
