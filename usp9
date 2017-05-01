@@ -1,0 +1,77 @@
+9. Write a program to:
+i. Create a zombie process
+ii. Create an orphan process
+
+#include <stdio.h>
+#include <unistd.h>
+
+void zombie()
+{
+    pid_t pid = fork();
+    if(!pid) // child
+        _exit(0);
+    else // parent
+            system("ps -aux | grep Z"); // search for zombies
+}
+
+void orphan()
+{
+    pid_t pid = fork();
+    if(!pid)
+    {
+           sleep(10);
+           printf("Adoptive Parent (init --user): %d\n", getppid());
+    }
+    else
+    {
+           printf("Original Parent : %d\n", getpid());
+           _exit(0);
+}
+}
+
+int main()
+{
+    int ch;
+    printf("Choice ... \n");
+    scanf("%d",&ch);
+    if(ch == 1)
+           zombie();
+    else
+           orphan();
+    return 0;
+}
+
+Output:-
+
+guest1@msrit-ThinkCentre-M58p:~$ vi cleanup.c
+guest1@msrit-ThinkCentre-M58p:~$ gcc cleanup.c
+guest1@msrit-ThinkCentre-M58p:~$ ./a.out
+Choice ...
+1
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+guest1    3081  0.0  0.0      0     0 pts/0    Z+   09:32   0:00 [a.out] <defunct>
+guest1    3082  0.0  0.0   2268   552 pts/0    S+   09:32   0:00 sh -c ps -aux | grep Z
+guest1    3084  0.0  0.0   4684   812 pts/0    S+   09:32   0:00 grep Z
+guest1@msrit-ThinkCentre-M58p:~$ ./a.out
+Choice ...
+2
+Original Parent : 3086
+guest1@msrit-ThinkCentre-M58p:~$ ./a.out
+Choice ...
+3
+Original Parent : 3090
+guest1@msrit-ThinkCentre-M58p:~$ ./a.out
+Choice ...
+4
+Original Parent : 3092
+guest1@msrit-ThinkCentre-M58p:~$ Adoptive Parent (init --user): 1825
+./a.out
+Choice ...
+Adoptive Parent (init --user): 1825
+5
+Original Parent : 3094
+guest1@msrit-ThinkCentre-M58p:~$ ./a.outAdoptive Parent (init --user): 1825
+Adoptive Parent (init --user): 1825
+Choice ...
+6
+Original Parent : 3291
