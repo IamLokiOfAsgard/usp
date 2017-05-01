@@ -1,3 +1,7 @@
+6. Write a program to demonstrate inter process communication using Shared memory. 
+one process should enter all the alphabets into the shared memory and other process should read it.
+
+
 SERVER
 
 #include <sys/types.h>
